@@ -1,0 +1,161 @@
+definitions:
+  main.Address:
+    properties:
+      city:
+        type: string
+    type: object
+  main.GeocodeRequest:
+    properties:
+      lat:
+        type: string
+      lng:
+        type: string
+    type: object
+  main.GeocodeResponse:
+    properties:
+      addresses:
+        items:
+          $ref: '#/definitions/main.Address'
+        type: array
+    type: object
+  main.SearchRequest:
+    properties:
+      query:
+        type: string
+    type: object
+  main.SearchResponse:
+    properties:
+      addresses:
+        items:
+          $ref: '#/definitions/main.Address'
+        type: array
+    type: object
+  main.User:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/address/geocode:
+    post:
+      consumes:
+      - application/json
+      description: Возвращает адреса по переданным широте и долготе через DaData API.
+      parameters:
+      - description: Широта и долгота
+        in: body
+        name: coordinates
+        required: true
+        schema:
+          $ref: '#/definitions/main.GeocodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GeocodeResponse'
+        "400":
+          description: Неверный формат запроса
+          schema:
+            type: string
+        "500":
+          description: Ошибка вызова API
+          schema:
+            type: string
+      summary: Обратное геокодирование
+      tags:
+      - Геокодирование
+  /api/address/search:
+    post:
+      consumes:
+      - application/json
+      description: Ищет адреса по переданному параметру query через DaData API.
+      parameters:
+      - description: Запрос с адресом
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/main.SearchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.SearchResponse'
+        "400":
+          description: Неверный формат запроса
+          schema:
+            type: string
+        "500":
+          description: Ошибка вызова API
+          schema:
+            type: string
+      summary: Поиск адресов
+      tags:
+      - Адреса
+  /api/login:
+    post:
+      consumes:
+      - application/json
+      description: Выполняет вход пользователя и возвращает JWT-токен, если учетные
+        данные верны
+      parameters:
+      - description: Учетные данные пользователя
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/main.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Пользователь не существует или пароль не совпадает
+          schema:
+            type: string
+        "400":
+          description: Неверный формат запроса
+          schema:
+            type: string
+      summary: Вход в систему пользователя
+      tags:
+      - authorization
+  /api/register:
+    post:
+      consumes:
+      - application/json
+      description: Регистрирует нового пользователя, сохраняя в памяти его имя пользователя
+        и хэшированный пароль
+      parameters:
+      - description: Учетные данные пользователя
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/main.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Пользователь успешно зарегистрирован
+          schema:
+            type: string
+        "400":
+          description: Неверный формат запроса
+          schema:
+            type: string
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Регистрация нового пользователя
+      tags:
+      - authorization
+swagger: "2.0"
